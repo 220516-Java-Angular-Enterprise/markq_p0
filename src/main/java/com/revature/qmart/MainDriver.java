@@ -1,7 +1,6 @@
 package com.revature.qmart;
 
 import com.revature.qmart.dao.UserDAO;
-import com.revature.qmart.models.User;
 import com.revature.qmart.services.UserService;
 import com.revature.qmart.ui.StartMenu;
 
@@ -12,7 +11,7 @@ public class MainDriver {
 //        UserDAO userDAO = new UserDAO();
 
         // anonymous function, will disappear after the start method executes...
-        new StartMenu(new UserService()).start();
+        new StartMenu(new UserService(new UserDAO())).start();
 
 
     }

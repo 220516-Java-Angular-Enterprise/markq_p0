@@ -2,6 +2,7 @@ package com.revature.qmart.ui;
 
 import com.revature.qmart.models.User;
 import com.revature.qmart.services.UserService;
+import com.revature.qmart.util.annotations.Inject;
 import com.revature.qmart.util.custom_exception.InvalidUserException;
 
 import java.util.Scanner;
@@ -14,9 +15,11 @@ public class StartMenu implements IMenu {
     * relies on the UserService class to retrieve data from the database, like a waiter at a restaurant
     * validates username, password, inventory, order history, store locations, etc.
     */
+    @Inject
     private final UserService userService; // dependency injection
-
+    @Inject
     public StartMenu(UserService userService) { // start menu constructor that takes an object of the UserService class
+        
         this.userService = userService;
     }
 
@@ -40,16 +43,14 @@ public class StartMenu implements IMenu {
                         signup();
                         break;
                     case "x":
+                        System.out.println("\nGoodbye!");
                         break exit;
                     default:
                         System.out.println("\nInvalid input.");
                         break;
 
                 }
-
             }
-            // exit out of the while loop with a isValidated boolean
-            // start mainmenu from here, you would of validated successfully and broken out of signup()
         }
     }
 
@@ -64,25 +65,36 @@ public class StartMenu implements IMenu {
     private void login() {
         String username;
         String password;
+//        User user = new User();
         Scanner scan = new Scanner(System.in);
+
         while(true) {
             System.out.println("\nLogging into account");
+            System.out.println("\nEnter username: ");
             username = scan.nextLine();
 
             System.out.println("\nPassword: ");
             password = scan.nextLine();
+
+            try {
+                User user = userService.login(username, password);
+
+                if (user.getRole().equals("ADMIN")) new AdminMenu().start();
+                else new MainMenu(user).start();
+                break;
+            } catch (InvalidUserException e) {
+                System.out.println(e.getMessage());
+            }
         }
-
-
     }
 
     private void signup() {
         String username;
         String password;
         Scanner scan = new Scanner(System.in);
-        boolean notValidated = true;
+
         completeExit: {
-            while (notValidated) {
+            while (true) {
 
                 System.out.println("\nThank you for choosing Q-Mart for all your shopping needs.\"");
                 System.out.println("Let's go ahead and create your new account!");
@@ -94,7 +106,9 @@ public class StartMenu implements IMenu {
 
                     // if username invalid, then break out of loop and re-prompt username
                     try {
-                        if (userService.isValidUsername(username)) break;
+                        if (userService.isValidUsername(username)) {
+                            if (userService.isNotDuplicateUsername(username)) break;
+                        }
                     } catch (InvalidUserException e) {
                         System.out.println(e.getMessage());
                     }
@@ -135,6 +149,7 @@ public class StartMenu implements IMenu {
                                 /* If yes, we instantiate a User object to store all the information into it. */
                                 User user = new User(UUID.randomUUID().toString(), username, password, "DEFAULT");
 
+                                userService.register(user);
 
                                 /* Calling the anonymous class MainMenu.start() to navigate to the main menu screen. */
                                 /* We are also passing in a user object, so we know who is logged in. */
@@ -142,7 +157,7 @@ public class StartMenu implements IMenu {
 
                                 break completeExit;
 
-                                case "n":
+                            case "n":
                                 /* Re-enter in credentials again, exit out of credential loop */
                                 break confirmExit;
                             default:
@@ -154,11 +169,10 @@ public class StartMenu implements IMenu {
 
                 }
 
-
             }
 
         }
-        System.out.println(notValidated);
+
     }
 
 }

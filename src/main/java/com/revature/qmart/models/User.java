@@ -5,22 +5,16 @@ public class User {
     private String username;
     private String password;
     private String role;
-
     public User() {
         super();
     }
 
-    // just have to do this for the jank db
-    public String toFileString() {
-        return id + ":" + username + ":" + password + ":" + role + "\n";
-    }
     public User(String id, String username, String password, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
     }
-
     public String getId() {
         return id;
     }
@@ -53,6 +47,9 @@ public class User {
         this.role = role;
     }
 
+    public String toFileString() {
+        return id + ":" + username + ":" + password + ":" + role + "\n";
+    }
     @Override
     public String toString() {
         return "User{" +
