@@ -5,11 +5,15 @@ import com.revature.qmart.services.UserService;
 import com.revature.qmart.util.annotations.Inject;
 import com.revature.qmart.util.custom_exception.InvalidUserException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.UUID;
 
 /* class purpose is to ask user to login, signup, or exit. */
 public class StartMenu implements IMenu {
+    String path = "src/main/resources/database/user.txt";
     /*
     * example of dependency injection
     * relies on the UserService class to retrieve data from the database, like a waiter at a restaurant
@@ -24,7 +28,7 @@ public class StartMenu implements IMenu {
     }
 
     @Override
-    public void start() {
+    public void start() throws FileNotFoundException {
         Scanner scan = new Scanner(System.in);
         // starting interactive display and validation
         exit:{
@@ -43,7 +47,7 @@ public class StartMenu implements IMenu {
                         signup();
                         break;
                     case "x":
-                        System.out.println("\nGoodbye!");
+                        System.out.println("\nGoodbye from start menu!");
                         break exit;
                     default:
                         System.out.println("\nInvalid input.");
@@ -65,7 +69,6 @@ public class StartMenu implements IMenu {
     private void login() {
         String username;
         String password;
-//        User user = new User();
         Scanner scan = new Scanner(System.in);
 
         while(true) {
@@ -75,7 +78,17 @@ public class StartMenu implements IMenu {
 
             System.out.println("\nPassword: ");
             password = scan.nextLine();
-
+            // check file is not empty before validating username and password
+            try {
+                File file = new File(path);
+                System.out.println(file.length());
+                if (file.length() == 0) {
+                    System.out.println("You need to signup first!");
+                    signup();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             try {
                 User user = userService.login(username, password);
 
@@ -84,11 +97,13 @@ public class StartMenu implements IMenu {
                 break;
             } catch (InvalidUserException e) {
                 System.out.println(e.getMessage());
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private void signup() {
+    private void signup() throws FileNotFoundException {
         String username;
         String password;
         Scanner scan = new Scanner(System.in);
@@ -104,6 +119,9 @@ public class StartMenu implements IMenu {
                     System.out.println("\nPlease enter a username: ");
                     username = scan.nextLine();
 
+                    // need to find out if they are the first user
+                    // maybe check database
+
                     // if username invalid, then break out of loop and re-prompt username
                     try {
                         if (userService.isValidUsername(username)) {
@@ -111,6 +129,9 @@ public class StartMenu implements IMenu {
                         }
                     } catch (InvalidUserException e) {
                         System.out.println(e.getMessage());
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
 
@@ -151,6 +172,7 @@ public class StartMenu implements IMenu {
 
                                 userService.register(user);
 
+                                /* **** Starting Main Menu **** */
                                 /* Calling the anonymous class MainMenu.start() to navigate to the main menu screen. */
                                 /* We are also passing in a user object, so we know who is logged in. */
                                 new MainMenu(user).start();

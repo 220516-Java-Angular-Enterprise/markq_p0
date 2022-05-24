@@ -3,8 +3,8 @@ package com.revature.qmart.dao;
 import com.revature.qmart.models.User;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class UserDAO implements CrudDAO<User> {
     String path = "src/main/resources/database/user.txt";
@@ -34,52 +34,70 @@ public class UserDAO implements CrudDAO<User> {
         return null;
     }
 
+
     @Override
     public List getAll() {
         return null;
     }
 
-    public List<String> getAllUsernames() {
-        List<String> usernames = new ArrayList<>();
+    public List<String> getAllUsernames() throws IOException {
+        StringBuilder userData = new StringBuilder();
+        ArrayList<String> usernames = new ArrayList<>();
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
+        // to read filepath
+        try (BufferedReader buffer = new BufferedReader(
+                new FileReader(path))) {
 
-            String userData = null; // id:username:password:role
+            // Condition check via buffer.readLine() method
+            // holding true up to that the while loop runs
+            String str;
+            while ((str = buffer.readLine()) != null) {
+                str = str.replaceAll(Pattern.quote(":DEFAULT"), ":DEFAULT:");
+                userData.append(str);
 
-            while ((userData = br.readLine()) != null) {
-                String[] userArr = userData.split(":"); // [id, username, password, role]
-//                String id = userArr[0];
-                System.out.println(userData);
-                String username = userArr[1];
-//                String password = userArr[2];
-//                String role = userArr[3];
+                String[] userArr = userData.toString().split(":");
+//                System.out.println(userArr.length);
 
-                usernames.add(username);
+                String username = userArr[userArr.length - 3];
+                if (!usernames.contains(username)) {
+                    usernames.add(username);
+//                    System.out.println(usernames);
+                }
+                // need to stop from looping an extra time...
+//                System.out.println("Out");
+
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("An error occurred when trying to access the file.");
-        } catch (IOException e) {
-            throw new RuntimeException("An error occurred when trying to access the file information.");
         }
 
         return usernames;
+
     }
     public User getUserByUsernameAndPassword(String un, String pw) {
         User user = new User();
+        StringBuilder userData = new StringBuilder();
+        ArrayList<String> userDataList = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
 
-            String userData; // id:username:password:role
-            while ((userData = br.readLine()) != null) {
-                System.out.println(userData);
+            String str;
+            while ((str = br.readLine()) != null) {
+                str = str.replaceAll(Pattern.quote(":DEFAULT"), ":DEFAULT:");
+                userData.append(str);
 
-                String[] userArr = userData.split(":"); // [id, username, password, role]
-                String id = userArr[0];
-                String username = userArr[1];
-                String password = userArr[2];
-                String role = userArr[3];
+                String[] userArr = userData.toString().split(":");
+
+                String id = userArr[userArr.length - 4];
+                String username = userArr[userArr.length - 3];
+                String password = userArr[userArr.length - 2];
+                String role = userArr[userArr.length -1];
+
+                // adding [id, username, password, role] individually, need to optimize this. Get help
+                userDataList.add(id);
+                userDataList.add(username);
+                userDataList.add(password);
+                userDataList.add(role);
+//                System.out.println(userDataList);
 
                 if (un.equals(username)) {
                     user.setId(id);
@@ -90,6 +108,8 @@ public class UserDAO implements CrudDAO<User> {
                     else break;
                 } else if (pw.equals(password)) user.setPassword(password);
             }
+
+
         } catch (FileNotFoundException e) {
             throw new RuntimeException("An error occurred when trying to access the file.");
         } catch (IOException e) {
@@ -98,4 +118,5 @@ public class UserDAO implements CrudDAO<User> {
 
         return user;
     }
+
 }

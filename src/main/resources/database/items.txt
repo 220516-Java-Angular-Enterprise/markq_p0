@@ -1,0 +1,3 @@
+ItemID:ItemA:$10.00:1000:Denver
+ItemID:Itemb:$5.00:1000:Denver
+ItemID:ItemC:$3.00:1000:Denver

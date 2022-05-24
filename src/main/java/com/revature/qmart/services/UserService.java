@@ -5,6 +5,10 @@ import com.revature.qmart.models.User;
 import com.revature.qmart.util.annotations.Inject;
 import com.revature.qmart.util.custom_exception.InvalidUserException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 /* Purpose: validation ie. checks username, password, and retrieve data from our daos. */
@@ -17,6 +21,7 @@ public class UserService {
         this.userDAO = userDAO;
     }
     public User login(String username, String password) {
+
         User user = userDAO.getUserByUsernameAndPassword(username, password);
 
         if (isValidCredentials(user)) return user;
@@ -32,8 +37,12 @@ public class UserService {
 
         throw new InvalidUserException("Invalid username. Username needs to be 8-20 characters long.");
     }
-    public boolean isNotDuplicateUsername(String username) {
-        List<String> usernames = userDAO.getAllUsernames();
+
+    // need to validate first user
+
+    public boolean isNotDuplicateUsername(String username) throws IOException {
+
+        List usernames = userDAO.getAllUsernames();
 
         if (usernames.contains(username)) throw new InvalidUserException("Username is already taken :(");
 
@@ -52,4 +61,6 @@ public class UserService {
 
         return true;
     }
+
+
 }

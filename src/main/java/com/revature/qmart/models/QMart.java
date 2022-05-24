@@ -1,16 +1,16 @@
 package com.revature.qmart.models;
 
-public class Restaurant {
+public class QMart {
     private String id;
     private String name;
     private String city;
     private String state;
 
-    public Restaurant() {
+    public QMart() {
         super();
     }
 
-    public Restaurant(String id, String name, String city, String state) {
+    public QMart(String id, String name, String city, String state) {
         this.id = id;
         this.name = name;
         this.city = city;
