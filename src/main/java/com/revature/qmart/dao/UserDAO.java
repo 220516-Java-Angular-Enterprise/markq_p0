@@ -1,25 +1,36 @@
 package com.revature.qmart.dao;
 
 import com.revature.qmart.models.User;
+import com.revature.qmart.util.database.DatabaseConnection;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class UserDAO implements CrudDAO<User> {
     String path = "src/main/resources/database/user.txt";
+    Connection con = DatabaseConnection.getCon();
     @Override
     public void save(User obj) {
         try {
-            File file  = new File(path);
-            // checked exception, have to handle immediately
-            FileWriter fw = new FileWriter(file, true);
-            fw.write(obj.toFileString());
-            fw.close();
+            PreparedStatement ps = con.prepareStatement("INSERT INTO users (id, username, password, role, address, city, state) VALUES (?,?,?,?,?,?,?)");
+            ps.setString(1,obj.getId());
+            ps.setString(2,obj.getUsername());
+            ps.setString(3,obj.getPassword());
+            ps.setString(4,obj.getRole());
+            ps.setString(5,"NULL");
+            ps.setString(6,"NULL");
+            ps.setString(7,"NULL");
+            ps.executeUpdate();
 
-        }  catch (IOException e) {
-            throw new RuntimeException("An error has occurred when writing to a file.");
+        } catch (SQLException e){
+            throw new RuntimeException("An error occurred when saving to the database.");
         }
+
     }
     @Override
     public void delete(String id) {
@@ -41,34 +52,18 @@ public class UserDAO implements CrudDAO<User> {
     }
 
     public List<String> getAllUsernames() throws IOException {
-        StringBuilder userData = new StringBuilder();
-        ArrayList<String> usernames = new ArrayList<>();
+        List<String> usernames = new ArrayList<>();
 
-        // to read filepath
-        try (BufferedReader buffer = new BufferedReader(
-                new FileReader(path))) {
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * username FROM user");
+            ResultSet rs = ps.executeQuery();
 
-            // Condition check via buffer.readLine() method
-            // holding true up to that the while loop runs
-            String str;
-            while ((str = buffer.readLine()) != null) {
-                str = str.replaceAll(Pattern.quote(":DEFAULT"), ":DEFAULT:");
-                userData.append(str);
-
-                String[] userArr = userData.toString().split(":");
-//                System.out.println(userArr.length);
-
-                String username = userArr[userArr.length - 3];
-                if (!usernames.contains(username)) {
-                    usernames.add(username);
-//                    System.out.println(usernames);
-                }
-                // need to stop from looping an extra time...
-//                System.out.println("Out");
-
+            while (rs.next()) {
+                usernames.add(rs.getString("username"));
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("An error occurred when trying to get data from the database.");
         }
-
         return usernames;
 
     }
