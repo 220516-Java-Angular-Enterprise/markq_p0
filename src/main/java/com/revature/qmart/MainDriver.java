@@ -15,7 +15,7 @@ public class MainDriver {
 
         // anonymous function, will disappear after the start method executes...
         new StartMenu(new UserService(new UserDAO())).start();
-        System.out.println(DatabaseConnection.getCon());
+//        System.out.println(DatabaseConnection.getCon());
 
 
     }

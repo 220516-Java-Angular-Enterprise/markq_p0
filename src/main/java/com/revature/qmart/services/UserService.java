@@ -21,12 +21,31 @@ public class UserService {
         this.userDAO = userDAO;
     }
     public User login(String username, String password) {
+        User user = new User(); //need this bc we're returning a user object
+        List<User> users = userDAO.getAll();
+        System.out.print(users);
 
-        User user = userDAO.getUserByUsernameAndPassword(username, password);
+        for(User u: users) {
+            if (u.getUsername().equals(username)) {
+                user.setId(u.getId());
+                user.setUsername(u.getUsername());
+                user.setPassword(u.getPassword());
 
-        if (isValidCredentials(user)) return user;
+                if (u.getPassword().equals(password)) {
+                    user.setPassword(u.getPassword());
+                    break;
+                }
+            }
 
-        return null;
+            if (u.getPassword().equals(password)) {
+                user.setPassword(u.getPassword());
+                break;
+            }
+        }
+
+
+
+        return isValidCredentials(user);
     }
     public void register(User user) {
 
@@ -53,13 +72,13 @@ public class UserService {
 
         throw new InvalidUserException("Invalid password. Minimum eight characters, at least one letter, one number and one special character.");
     }
-    private boolean isValidCredentials(User user) {
+    private User isValidCredentials(User user) {
 
         if (user.getUsername() == null && user.getPassword() == null) throw new InvalidUserException("Incorrect username and password.");
         else if (user.getUsername() == null) throw new InvalidUserException("Incorrect username.");
         else if (user.getPassword() == null) throw new InvalidUserException("Incorrect password.");
 
-        return true;
+        return user;
     }
 
 

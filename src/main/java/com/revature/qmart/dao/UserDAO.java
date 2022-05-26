@@ -48,21 +48,40 @@ public class UserDAO implements CrudDAO<User> {
 
     @Override
     public List getAll() {
-        return null;
-    }
+        List<User> users = new ArrayList<>();
 
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM users");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setId(rs.getString("username"));
+                user.setId(rs.getString("password"));
+                user.setId(rs.getString("role"));
+
+                users.add(user);
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("An error occurred when trying to get data from the database.");
+        }
+        return users;
+    }
     public List<String> getAllUsernames() throws IOException {
         List<String> usernames = new ArrayList<>();
 
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * username FROM user");
+            PreparedStatement ps = con.prepareStatement("SELECT username FROM users");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 usernames.add(rs.getString("username"));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred when trying to get data from the database.");
+//            throw new RuntimeException("An error occurred when trying to get data from the database.");
+            new Exception().printStackTrace();
         }
         return usernames;
 
