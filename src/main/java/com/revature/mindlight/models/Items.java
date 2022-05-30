@@ -1,4 +1,4 @@
-package com.revature.qmart.models;
+package com.revature.mindlight.models;
 
 public class Items {
     private String itemid;
@@ -7,20 +7,28 @@ public class Items {
 
     private double itemcost;
 
-    private int stock;
-    private String location;
+    private String type;
 
-    public String getLocation() {
-        return location;
-    }
+    private String status;
+
 
     public Items() { super(); }
 
-    public Items(String itemid, String itemname, double itemcost, int stock) {
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Items(String itemid, String itemname, double itemcost, String type, String status) {
         this.itemid = itemid;
         this.itemname = itemname;
         this.itemcost = itemcost;
-        this.stock = stock;
+        this.type = type;
+        this.status = status;
 
     }
 
@@ -47,13 +55,12 @@ public class Items {
     public void setItemcost(double itemcost) {
         this.itemcost = itemcost;
     }
-
-    public int getStock() {
-        return stock;
+    public String getType() {
+        return type;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -62,8 +69,8 @@ public class Items {
                 "itemid='" + itemid + '\'' +
                 ", itemname='" + itemname + '\'' +
                 ", itemcost=" + itemcost +
-                ", stock=" + stock +
-                ", location='" + location + '\'' +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

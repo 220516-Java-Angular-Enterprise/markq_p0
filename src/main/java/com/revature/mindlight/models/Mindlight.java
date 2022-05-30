@@ -1,16 +1,16 @@
-package com.revature.qmart.models;
+package com.revature.mindlight.models;
 
-public class QMart {
+public class Mindlight {
     private String id;
     private String name;
     private String city;
     private String state;
 
-    public QMart() {
+    public Mindlight() {
         super();
     }
 
-    public QMart(String id, String name, String city, String state) {
+    public Mindlight(String id, String name, String city, String state) {
         this.id = id;
         this.name = name;
         this.city = city;

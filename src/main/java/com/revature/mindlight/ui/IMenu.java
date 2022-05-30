@@ -1,4 +1,4 @@
-package com.revature.qmart.ui;
+package com.revature.mindlight.ui;
 
 import java.io.FileNotFoundException;
 

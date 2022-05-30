@@ -1,4 +1,4 @@
-package com.revature.qmart.util.custom_exception;
+package com.revature.mindlight.util.custom_exception;
 
 public class InvalidUserException extends RuntimeException {
     public InvalidUserException(String message) {

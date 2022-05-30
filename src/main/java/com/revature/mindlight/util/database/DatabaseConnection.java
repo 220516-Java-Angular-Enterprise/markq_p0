@@ -1,4 +1,4 @@
-package com.revature.qmart.util.database;
+package com.revature.mindlight.util.database;
 
 import java.io.FileReader;
 import java.io.IOException;

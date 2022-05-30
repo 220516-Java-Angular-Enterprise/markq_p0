@@ -1,13 +1,9 @@
-package com.revature.qmart.ui;
+package com.revature.mindlight.ui;
 
 
-import com.revature.qmart.dao.StoreDAO;
-import com.revature.qmart.models.Items;
-import com.revature.qmart.models.QMart;
-import com.revature.qmart.models.User;
+import com.revature.mindlight.models.User;
 
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Scanner;
 
 public class MainMenu implements IMenu {
@@ -18,8 +14,8 @@ public class MainMenu implements IMenu {
     }
 
     @Override
-    public void start() throws FileNotFoundException {
-        System.out.println("\nWelcome to our main menu " + user.getUsername());
+    public void start() {
+        System.out.println("\nWelcome to our main menu! " + user.getUsername());
 
         Scanner scan = new Scanner(System.in);
         // starting interactive display and validation
@@ -38,12 +34,13 @@ public class MainMenu implements IMenu {
                        // need to show items, cost, inventory, etc. to user
                         // show menu
                         // getItemsFromRestaurantDAO
-                        browse();
-
                         break;
                     case "2": // signup, new customer
                       System.out.println("Order History");
                         break;
+                    case "3": // view account details, make changes if necessary
+                        System.out.println("View and edit account");
+                            break;
                     case "x":
                         System.out.println("\nGoodbye from main menu!");
                         break exit;
@@ -57,13 +54,11 @@ public class MainMenu implements IMenu {
     }
     private void displayWelcomeMainMsg() {
         System.out.println("\nWhat would you like to do?");
+        System.out.println("\n");
         System.out.println("[1] View Store Items");
         System.out.println("[2] Order History");
-        System.out.println("[x] Exit");
+        System.out.println("[3] View Account");
+        System.out.println("[x] Save & Exit");
     }
 
-    public void browse() throws FileNotFoundException {
-        StoreDAO store = new StoreDAO();
-        System.out.println(store.getAllItems());
-    }
 }

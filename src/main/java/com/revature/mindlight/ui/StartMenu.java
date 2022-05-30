@@ -1,11 +1,16 @@
-package com.revature.qmart.ui;
+package com.revature.mindlight.ui;
 
-import com.revature.qmart.models.User;
-import com.revature.qmart.services.UserService;
-import com.revature.qmart.util.annotations.Inject;
-import com.revature.qmart.util.custom_exception.InvalidUserException;
+import com.revature.mindlight.dao.CartDAO;
+import com.revature.mindlight.dao.ItemDAO;
+import com.revature.mindlight.dao.OrderDAO;
+import com.revature.mindlight.dao.UserDAO;
+import com.revature.mindlight.models.User;
+import com.revature.mindlight.services.ItemService;
+import com.revature.mindlight.services.OrderService;
+import com.revature.mindlight.services.UserService;
+import com.revature.mindlight.util.annotations.Inject;
+import com.revature.mindlight.util.custom_exception.InvalidUserException;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
@@ -59,8 +64,9 @@ public class StartMenu implements IMenu {
     }
 
     private void displayWelcomeMsg() {
-        System.out.println("\nHello! Thank you for choosing Q-Mart.");
-        System.out.println("\n");
+        System.out.println("#####################################################");
+        System.out.println("#########" + " Thank you for choosing Mindlight! " + "#########");
+        System.out.println("#####################################################");
         System.out.println("[1] Are you a returning Customer? Login");
         System.out.println("[2] New Customer? Signup");
         System.out.println("[x] Exit");
@@ -78,26 +84,15 @@ public class StartMenu implements IMenu {
 
             System.out.println("\nPassword: ");
             password = scan.nextLine();
-            // check file is not empty before validating username and password
-            try {
-                File file = new File(path);
-                System.out.println(file.length());
-                if (file.length() == 0) {
-                    System.out.println("You need to signup first!");
-                    signup();
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+
             try {
                 User user = userService.login(username, password);
-
-                if (user.getRole().equals("ADMIN")) new AdminMenu().start();
+                if (user.getRole().equals("ADMIN")) new AdminMenu(user, new UserService(new UserDAO()), new ItemService(new ItemDAO()), new OrderService(new OrderDAO(), new CartDAO())).start();
                 else new MainMenu(user).start();
                 break;
             } catch (InvalidUserException e) {
                 System.out.println(e.getMessage());
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -110,9 +105,8 @@ public class StartMenu implements IMenu {
 
         completeExit: {
             while (true) {
-
-                System.out.println("\nThank you for choosing Q-Mart for all your shopping needs.\"");
                 System.out.println("Let's go ahead and create your new account!");
+
 
                 while(true) {
                     // ask user to enter an appropriate username
@@ -168,7 +162,7 @@ public class StartMenu implements IMenu {
                         switch (input) {
                             case "y": /* Break out of the entire loop. */
                                 /* If yes, we instantiate a User object to store all the information into it. */
-                                User user = new User(UUID.randomUUID().toString(), username, password, "DEFAULT");
+                                User user = new User(UUID.randomUUID().toString(), username, password, "DEFAULT", "NULL", "NULL", "NULL");
 
                                 userService.register(user);
 

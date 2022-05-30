@@ -1,4 +1,4 @@
-package com.revature.qmart.util.annotations;
+package com.revature.mindlight.util.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

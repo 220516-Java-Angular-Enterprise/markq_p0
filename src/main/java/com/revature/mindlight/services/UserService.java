@@ -1,14 +1,11 @@
-package com.revature.qmart.services;
+package com.revature.mindlight.services;
 
-import com.revature.qmart.dao.UserDAO;
-import com.revature.qmart.models.User;
-import com.revature.qmart.util.annotations.Inject;
-import com.revature.qmart.util.custom_exception.InvalidUserException;
+import com.revature.mindlight.dao.UserDAO;
+import com.revature.mindlight.models.User;
+import com.revature.mindlight.util.annotations.Inject;
+import com.revature.mindlight.util.custom_exception.InvalidUserException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /* Purpose: validation ie. checks username, password, and retrieve data from our daos. */
@@ -20,32 +17,33 @@ public class UserService {
 
         this.userDAO = userDAO;
     }
-    public User login(String username, String password) {
+    public User login(String username, String password) throws IOException {
         User user = new User(); //need this bc we're returning a user object
         List<User> users = userDAO.getAll();
-        System.out.print(users);
 
         for(User u: users) {
-            if (u.getUsername().equals(username)) {
-                user.setId(u.getId());
-                user.setUsername(u.getUsername());
-                user.setPassword(u.getPassword());
-
-                if (u.getPassword().equals(password)) {
-                    user.setPassword(u.getPassword());
-                    break;
+//            System.out.println(u);
+                if (u.getUsername().equals(username)) {
+                    user.setId(u.getId());
+                    user.setUsername(u.getUsername());
+                    user.setRole(u.getRole());
+                    if (u.getPassword().equals(password)) {
+                        user.setPassword(u.getPassword());
+                        break;
+                    }
                 }
-            }
-
-            if (u.getPassword().equals(password)) {
-                user.setPassword(u.getPassword());
-                break;
-            }
+                if (u.getPassword().equals(password)) {
+                 user.setPassword(u.getPassword());
+                }
         }
-
-
-
         return isValidCredentials(user);
+    }
+    public void viewAccount(User user) {
+        System.out.println(userDAO.getById(user.getId()));
+
+    }
+    public List<User> viewAllUsers() {
+        return userDAO.getAll();
     }
     public void register(User user) {
 

@@ -1,4 +1,8 @@
-package com.revature.qmart.dao;
+package com.revature.mindlight.dao;
+
+import com.revature.mindlight.models.Items;
+import com.revature.mindlight.models.Order;
+import com.revature.mindlight.models.User;
 
 import java.util.List;
 
