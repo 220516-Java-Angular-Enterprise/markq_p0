@@ -285,13 +285,13 @@ public class AdminMenu implements IMenu {
         System.out.println("| ...All User Details... |");
         System.out.println("+------------------------+");
         System.out.println("\n");
-        System.out.println("ID " + "USERNAME " + " PASSWORD " + " ROLE " + " CITY " + " STATE " + " ADDRESS");
+        System.out.println("ROW#  " +  " USERNAME " + " PASSWORD " + " ROLE " + " ID");
 
         List<User> users = userService.viewAllUsers();
 
         for(int i=0; i<users.size(); i++){
             System.out.println("[" + (i+1) + "]" + " " + users.get(i).getUsername() + " " +
-                    users.get(i).getPassword() + "\n") ;
+                    users.get(i).getPassword() + " " + users.get(i).getRole() + " " + users.get(i).getId() + "\n") ;
         }
     }
     private void addToCart(List<Items> cognitives, List<Items> sedatives, List<Items> workout) {
