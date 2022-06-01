@@ -7,6 +7,8 @@ import com.revature.mindlight.models.Order;
 import com.revature.mindlight.models.User;
 import com.revature.mindlight.util.annotations.Inject;
 
+import java.util.List;
+
 public class OrderService {
 
     @Inject
@@ -26,5 +28,15 @@ public class OrderService {
 
     public void makeCartOrder(Order order) {
             cartDAO.save(order);
+    }
+
+    public List<Order> allOrders() {
+        List<Order> orders = orderDAO.getAll();
+        return orders;
+    }
+    public List<Order> allOrdersbyUserId(User user) {
+
+        List<Order> orders = cartDAO.getAllOrdersByUserId(user);
+        return orders;
     }
 }

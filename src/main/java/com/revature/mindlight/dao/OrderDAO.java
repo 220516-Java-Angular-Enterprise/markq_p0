@@ -1,11 +1,14 @@
 package com.revature.mindlight.dao;
 
 import com.revature.mindlight.models.Order;
+import com.revature.mindlight.models.User;
 import com.revature.mindlight.util.database.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO implements CrudDAO<Order>{
@@ -49,6 +52,27 @@ public class OrderDAO implements CrudDAO<Order>{
 
     @Override
     public List<Order> getAll() {
-        return null;
+        List<Order> orders = new ArrayList<>();
+
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM orders");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getString("id"));
+                order.setOrdername(rs.getString("ordername"));
+                order.setTotal(rs.getFloat("total"));
+                order.setDate(rs.getString("date"));
+                order.setOrderstatus(rs.getString("orderstatus"));
+                order.setStoreid(rs.getString("storeid"));
+
+                orders.add(order);
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("An error occurred when trying to get data from the database.");
+        }
+        return orders;
     }
 }

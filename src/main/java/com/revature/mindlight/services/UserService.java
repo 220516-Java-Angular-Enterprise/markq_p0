@@ -38,9 +38,8 @@ public class UserService {
         }
         return isValidCredentials(user);
     }
-    public void viewAccount(User user) {
-        System.out.println(userDAO.getById(user.getId()));
-
+    public User viewAccountDetails(User user) {
+        return userDAO.getById(user.getId());
     }
     public List<User> viewAllUsers() {
         return userDAO.getAll();

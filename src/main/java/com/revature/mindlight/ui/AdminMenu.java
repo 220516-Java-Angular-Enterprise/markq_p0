@@ -1,9 +1,11 @@
 package com.revature.mindlight.ui;
 
 import com.revature.mindlight.models.Items;
+import com.revature.mindlight.models.Mindlight;
 import com.revature.mindlight.models.Order;
 import com.revature.mindlight.models.User;
 import com.revature.mindlight.services.ItemService;
+import com.revature.mindlight.services.MindlightService;
 import com.revature.mindlight.services.OrderService;
 import com.revature.mindlight.services.UserService;
 
@@ -16,15 +18,16 @@ public class AdminMenu implements IMenu {
     private final User user;
     private final UserService userService;
     private final ItemService itemService;
-
     private final OrderService orderService;
 
+    private final MindlightService mindlightService;
 
-    public AdminMenu(User user, UserService userService, ItemService itemService, OrderService orderService) {
+    public AdminMenu(User user, UserService userService, ItemService itemService, OrderService orderService, MindlightService mindlightService) {
         this.user = user;
         this.userService = userService;
         this.itemService = itemService;
         this.orderService = orderService;
+        this.mindlightService = mindlightService;
     }
 
 
@@ -32,14 +35,14 @@ public class AdminMenu implements IMenu {
     public void start() {
         Scanner scan = new Scanner(System.in);
 
-        completeExit:{
+        exit:{
             while(true) {
                 displayAdminMsg();
 
                 System.out.println("\nEnter: ");
                 String input = scan.nextLine();
 
-                switch (input) { // accounts
+                switch (input) {
 
                     case "1":
                         viewAccount();
@@ -57,7 +60,7 @@ public class AdminMenu implements IMenu {
                         viewUsers();
                         break;
                     case "x":
-                        break completeExit; // for some reason, looping through this section twice
+                        break exit; // for some reason, looping through this section twice
 
                 }
             }
@@ -73,18 +76,32 @@ public class AdminMenu implements IMenu {
         System.out.println("[x] Exit");
     }
 
+    private void itemDisplayMsg(List<Items> c, List<Items> s, List<Items> w) {
+        System.out.println("|Item Name|" + "|Price|" + "|Stock|");
+        System.out.println("NooFocus: " + "$75.00 " + "{" + c.size() + "}");
+        System.out.println("Sleepytime Elixer: " + "$25.00 " +"{" + s.size() + "}");
+        System.out.println("Mindlight Protein Shake: " + "$35.00 " +"{" + w.size() + "}");
+        System.out.println("\n");
+    }
+    private void itemShopDisplayMsg(List<Items> c, List<Items> s, List<Items> w) {
+        System.out.println("|Item Name|" + "|Price|" + "|Stock|");
+        System.out.println("[1] NooFocus: " + "$75.00 " + "{" + c.size() + "}");
+        System.out.println("[2] Sleepytime Elixer: " + "$25.00 " +"{" + s.size() + "}");
+        System.out.println("[3] Mindlight Protein Shake: " + "$35.00 " +"{" + w.size() + "}");
+        System.out.println("[c] Checkout");
+        System.out.println("[x] Exit");
+        System.out.println("\n");
+    }
+
     private void viewAccount() {
-
-        Scanner scan = new Scanner(System.in);
-
         System.out.println("\n+------------------------+");
         System.out.println("| ...All Account Details... |");
         System.out.println("+------------------------+");
-        userService.viewAccount(user);
 
-        System.out.print("\nEnter: ");
-        String input = scan.nextLine();
-            // need to add to view account, for now works fine with displaying
+        System.out.println("Name: " + userService.viewAccountDetails(user).getUsername());
+        System.out.println("Password: " + userService.viewAccountDetails(user).getPassword());
+        System.out.println("Role: " + userService.viewAccountDetails(user).getRole());
+        System.out.println("ID: " + userService.viewAccountDetails(user).getId() +"\n");
 
     }
     private void viewOrders() {
@@ -94,7 +111,7 @@ public class AdminMenu implements IMenu {
             while (true) {
                 System.out.println("[1] All Store Orders");
                 System.out.println("[2] Personal Orders");
-                System.out.println("[x] Return to Admin Menu");
+                System.out.println("[x] Admin Menu ");
 
                 Scanner scan = new Scanner(System.in);
                 System.out.println("\nEnter: ");
@@ -102,12 +119,15 @@ public class AdminMenu implements IMenu {
 
                 switch (input) {
                     case "1":
-                        System.out.println("Show all orders");
-                        break;
+                        List<Order> o = orderService.allOrders();
+                        allOrders(o);
+                        break exit;
                     case "2":
-                        System.out.println("Show personal orders");
-                        break;
+                        List<Order> opers = orderService.allOrdersbyUserId(user);
+                        allOrders(opers);
+                        break exit;
                     case "x":
+                        start();
                         break exit;
                     default:
                         System.out.println("\nInvalid input.");
@@ -117,14 +137,17 @@ public class AdminMenu implements IMenu {
         }
     }
     public void viewItems() {
-        System.out.println("\nAll Store Items");
+        System.out.println("\n+------------------------+");
+        System.out.println("| ...All Store Items... |");
+        System.out.println("+------------------------+");
 
         Scanner scan = new Scanner(System.in);
-        List<Items> allitems = itemService.allItems();
 
+        List<Items> allitems = itemService.allItems();
         List<Items> cognitives = new ArrayList<>();
         List<Items> sedatives = new ArrayList<>();
         List<Items> workout = new ArrayList<>();
+
         for(Items i: allitems) {
             if (Objects.equals(i.getItemname(), "NooFocus")) {
                 cognitives.add(i);
@@ -137,19 +160,13 @@ public class AdminMenu implements IMenu {
             }
         }
 
-        System.out.println("|Item Name|" + "|Price|" + "|Stock|");
-
-        System.out.println("NooFocus: " + "$75.00 " + "{" + cognitives.size() + "}");
-        System.out.println("Sleepytime Elixer: " + "$25.00 " +"{" + sedatives.size() + "}");
-        System.out.println("Mindlight Protein Shake: " + "$35.00 " +"{" + workout.size() + "}");
-        System.out.println("\n");
-
+        itemDisplayMsg(cognitives, sedatives, workout);
         exit:
         {
             System.out.println("[1] Create New");
-            System.out.println("[2] Update");
-            System.out.println("[3] Delete");
-            System.out.println("[4] Add");
+//            System.out.println("[2] Update"); // need to add update and delete item features
+//            System.out.println("[3] Delete");
+            System.out.println("[2] Shop Items");
             System.out.println("[x] Admin Menu");
 
             System.out.print("\nEnter: ");
@@ -159,13 +176,7 @@ public class AdminMenu implements IMenu {
                     createItem();
                     break;
                 case "2":
-//                    updateItem();
-                    break;
-                case "3":
-//                    deleteItem();
-                    break;
-                case "4":
-                    addToCart(allitems);
+                    addToCart(cognitives, sedatives, workout);
                     break exit;
                 case "x":
                     start();
@@ -176,9 +187,97 @@ public class AdminMenu implements IMenu {
             }
         }
     }
+    private void printOrdersBySort(List<Order> orders) {
+        System.out.println("\n+---------------------------------------------+");
+        System.out.println("| .....Order Details..... |");
+        System.out.println("+---------------------------------------------+");
 
+        for (int i = 0; i < orders.size(); i++) {
+            System.out.println(("[" + (i+1) + "]" +" ORDERID: " + orders.get(i).getId())
+                    + ",  " + "ORDERTOTAL: $" + orders.get(i).getTotal()
+                    + ",  " + "DATE FULFILLED: " + orders.get(i).getDate()
+                    + ",  STOREID: |" + orders.get(i).getStoreid() + "|");
+        }
+        System.out.println("\n");
+        System.out.println("[o] Orders ");
+        System.out.println("[x] Return to Admin Menu");
+        Scanner scan = new Scanner(System.in);
+
+        exit:
+        {
+            while (true) {
+
+                System.out.println("\nEnter: ");
+                String input = scan.nextLine();
+                switch (input) {
+
+                    case "o":
+                        viewOrders();
+                        break exit;
+                    case "x":
+                        break exit;
+                    default:
+                        System.out.println("\nInvalid input.");
+                        break;
+                }
+            }
+        }
+    }
+    private void allOrders(List<Order> orders) {
+
+        exit:
+        {
+            while (true) {
+
+                Scanner scan = new Scanner(System.in);
+
+                System.out.println("[1] Orders By Cost: Low to High");
+                System.out.println("[2] Orders By Cost: High to Low");
+                System.out.println("[3] Orders By Date: Most Recent Last");
+                System.out.println("[4] Orders By Date: Most Recent First");
+                System.out.println("[x] Orders Menu");
+
+                System.out.println("\nEnter: ");
+                String input = scan.nextLine();
+
+                Comparator<Order> comparebyDate = Comparator.comparing(Order::getDate);
+                Comparator<Order> comparebyPrice = Comparator.comparing(Order::getTotal);
+
+                switch (input) {
+                    case "1":
+                        Collections.sort(orders, comparebyPrice);
+                        printOrdersBySort(orders);
+                        break exit;
+                    case "2":
+                        Collections.sort(orders, comparebyPrice.reversed());
+                        printOrdersBySort(orders);
+                        break exit;
+                    case "3":
+                        Collections.sort(orders, comparebyDate);
+                        printOrdersBySort(orders);
+                        break exit;
+                    case "4":
+                        Collections.sort(orders, comparebyDate.reversed());
+                        printOrdersBySort(orders);
+                        break exit;
+                    case "x":
+                        viewOrders();
+                        break exit;
+                    default:
+                        System.out.println("\nInvalid input.");
+                        break;
+                }
+            }
+        }
+    }
     private void viewStores() {
-        System.out.println("All store details");
+        List<Mindlight> store = mindlightService.allStores();
+        for (int i=0; i<store.size(); i++) {
+            System.out.println("Name: " + store.get(i).getName());
+            System.out.println("ID: " + store.get(i).getId());
+            System.out.println("City: " + store.get(i).getCity());
+            System.out.println("State: " + store.get(i).getState() +"\n");
+        }
     }
 
     private void viewUsers() {
@@ -192,79 +291,51 @@ public class AdminMenu implements IMenu {
 
         for(int i=0; i<users.size(); i++){
             System.out.println("[" + (i+1) + "]" + " " + users.get(i).getUsername() + " " +
-                    users.get(i).getPassword() + " " + users.get(i).getRole() + " " +
-                    users.get(i).getCity() + " " + users.get(i).getState() + " " +
-                    users.get(i).getAddress());
+                    users.get(i).getPassword() + "\n") ;
         }
-        System.out.print("\nEnter: ");
-        Scanner scan = new Scanner(System.in);
-        String input = scan.nextLine();
-        // need to add to view account, for now works fine with displaying
-
     }
+    private void addToCart(List<Items> cognitives, List<Items> sedatives, List<Items> workout) {
+        List<Items> cart = new ArrayList<>();
 
-    private void addToCart(List<Items> allitems) {
-
-                List<Items> cart = new ArrayList<>();
-                List<Items> cognitives = new ArrayList<>();
-                List<Items> sedatives = new ArrayList<>();
-                List<Items> workout = new ArrayList<>();
-
-                for(Items i: allitems) {
-                    if (Objects.equals(i.getItemname(), "NooFocus")) {
-                        cognitives.add(i);
-                    }
-                    if (Objects.equals(i.getItemname(), "Sleepytime Elixer")) {
-                        sedatives.add(i);
-                    }
-                    if (Objects.equals(i.getItemname(), "Mindlight Protein Shake")) {
-                        workout.add(i);
-                    }
-                }
         exit:
         {
-            while(true) {
+            while (true) {
                 Scanner scan = new Scanner(System.in);
                 // display items menu
                 System.out.print("\n");
                 System.out.println("Select Item to Add");
-                System.out.println("[1] Noofocus: $75.00");
-                System.out.println("[2] Sleepytime Elixer: $25.00");
-                System.out.println("[3] Mindlight Protein Shake: $35.00");
-                System.out.println("[c] Checkout");
-                System.out.println("[x] All Items Options");
 
+                itemShopDisplayMsg(cognitives, sedatives, workout);
 
                 System.out.println("\nEnter: ");
                 String input = scan.nextLine();
                 switch (input) {
 
                     case "1":
-                        try {
+                        if (!cognitives.isEmpty()) {
                             cart.add(cognitives.remove(0));
-                        } catch (Exception e) {
-                            throw new IndexOutOfBoundsException("Sorry, that item is out of stock");
+                        } else {
+                            System.out.println("Sorry, that item is out of stock.");
                         }
                         break;
                     case "2":
-                        try {
+                        if (!sedatives.isEmpty()) {
                             cart.add(sedatives.remove(0));
-                        } catch (Exception e) {
-                            throw new IndexOutOfBoundsException("Sorry, that item is out of stock");
+                        } else {
+                            System.out.println("Sorry, that item is out of stock.");
                         }
                         break;
                     case "3":
-                        try {
+                        if (!workout.isEmpty()) {
                             cart.add(workout.remove(0));
-                        } catch (Exception e) {
-                            throw new IndexOutOfBoundsException("Sorry, that item is out of stock");
+                        } else {
+                            System.out.println("Sorry, that item is out of stock.");
                         }
                         break;
                     case "c":
-                        if(cart.size() == 0) {
+                        if (cart.size() == 0) {
                             System.out.println("*** Your cart is empty ***");
-                        }
-                        else {
+                        } else {
                             createOrder(cart);
                             break exit;
                         }
@@ -275,9 +346,10 @@ public class AdminMenu implements IMenu {
                     default:
                         System.out.println("\nInvalid input.");
                         break;
+
                 }
-                System.out.println("\n");
-                System.out.println("\n+------------------------+");
+
+            System.out.println("\n+------------------------+");
                 System.out.println("| ...Cart Details... |");
                 System.out.println("+------------------------+");
                 System.out.println("Current Items In Cart");
@@ -288,6 +360,7 @@ public class AdminMenu implements IMenu {
             }
         }
     }
+
     private void createItem() {
         Scanner scan = new Scanner(System.in);
         Items item = new Items();
@@ -299,19 +372,33 @@ public class AdminMenu implements IMenu {
                 System.out.println("| ...Creating new item... |");
                 System.out.println("+------------------------+");
 
+                System.out.println("Select Item To Restock");
+                System.out.println("[1] NooFocus");
+                System.out.println("[2] Sleepytime Elixer");
+                System.out.println("[3] Mindlight Protein Shake");
+
+                System.out.print("\nEnter: ");
+                String input = scan.nextLine();
+
                 item.setItemid((UUID.randomUUID().toString()));
-
-                System.out.print("Name: ");
-                item.setItemname(scan.nextLine());
-
-                System.out.print("\nPrice: ");
-                item.setItemcost(Double.parseDouble(scan.nextLine()));
-
-                System.out.print("\nType: ");
-                item.setType(scan.nextLine());
-
-                // default status is in stock
                 item.setStatus("STOCK");
+
+                switch(input) {
+                    case "1":
+                        item.setItemname("NooFocus");
+                        item.setItemcost(75.00);
+                        item.setType("Cognitive");
+                        break;
+                    case "2":
+                        item.setItemname("Sleepytime Elixer");
+                        item.setItemcost(25.00);
+                        item.setType("Sedative");
+                        break;
+                    case "3":
+                        item.setItemname("Mindlight Protein Shake");
+                        item.setItemcost(35.00);
+                        item.setType("Workout");
+                }
 
                 System.out.println("\nPlease confirm item (y/n)");
                 System.out.println("\n" + item);
@@ -329,7 +416,6 @@ public class AdminMenu implements IMenu {
             }
         }
     }
-
     private void createOrder(List<Items> items) {
         Scanner scan = new Scanner(System.in);
         Order order = new Order();
@@ -372,9 +458,11 @@ public class AdminMenu implements IMenu {
                         orderService.makeOrder(order); // inserting unique order into order table
 
                         System.out.println("Congratulations " + user.getUsername() + "!!" + " Your order was successful.");
+                        System.out.println("\n");
+
                         itemService.update(items); // updating item status to SOLD
 
-                        addToCart(items); // prompting user to return to add to cart menu
+                        start();
                         break exit;
                     case "n":
                         viewItems();
@@ -386,6 +474,8 @@ public class AdminMenu implements IMenu {
             }
         }
     }
+
+    // needs to be finished, as well as delete items
     private void updateItem() {
         Scanner scan = new Scanner(System.in);
 
@@ -394,10 +484,6 @@ public class AdminMenu implements IMenu {
             System.out.println("| Please select an item to update price |");
             System.out.println("+-------------------------------------------+");
             itemService.allItems();
-//            System.out.println(items);
-//            for (int i = 0; i < items.getSize(); i++) {
-//                System.out.println("[" + (i + 1) + "] " + restaurants.get(i).getName());
-//            }
 
             System.out.print("\nEnter: ");
             int input = scan.nextInt() - 1;

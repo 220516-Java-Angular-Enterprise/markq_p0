@@ -1,11 +1,9 @@
 package com.revature.mindlight.ui;
 
-import com.revature.mindlight.dao.CartDAO;
-import com.revature.mindlight.dao.ItemDAO;
-import com.revature.mindlight.dao.OrderDAO;
-import com.revature.mindlight.dao.UserDAO;
+import com.revature.mindlight.dao.*;
 import com.revature.mindlight.models.User;
 import com.revature.mindlight.services.ItemService;
+import com.revature.mindlight.services.MindlightService;
 import com.revature.mindlight.services.OrderService;
 import com.revature.mindlight.services.UserService;
 import com.revature.mindlight.util.annotations.Inject;
@@ -52,7 +50,7 @@ public class StartMenu implements IMenu {
                         signup();
                         break;
                     case "x":
-                        System.out.println("\nGoodbye from start menu!");
+                        System.out.println("\nGoodbye from Mindlight!");
                         break exit;
                     default:
                         System.out.println("\nInvalid input.");
@@ -87,8 +85,8 @@ public class StartMenu implements IMenu {
 
             try {
                 User user = userService.login(username, password);
-                if (user.getRole().equals("ADMIN")) new AdminMenu(user, new UserService(new UserDAO()), new ItemService(new ItemDAO()), new OrderService(new OrderDAO(), new CartDAO())).start();
-                else new MainMenu(user).start();
+                if (user.getRole().equals("ADMIN")) new AdminMenu(user, new UserService(new UserDAO()), new ItemService(new ItemDAO()), new OrderService(new OrderDAO(), new CartDAO()), new MindlightService(new StoreDAO())).start();
+                else new MainMenu(user, new UserService(new UserDAO()), new ItemService(new ItemDAO()), new OrderService(new OrderDAO(), new CartDAO())).start();
                 break;
             } catch (InvalidUserException e) {
                 System.out.println(e.getMessage());
@@ -169,7 +167,7 @@ public class StartMenu implements IMenu {
                                 /* **** Starting Main Menu **** */
                                 /* Calling the anonymous class MainMenu.start() to navigate to the main menu screen. */
                                 /* We are also passing in a user object, so we know who is logged in. */
-                                new MainMenu(user).start();
+                                new MainMenu(user, new UserService(new UserDAO()), new ItemService(new ItemDAO()), new OrderService(new OrderDAO(), new CartDAO())).start();
 
                                 break completeExit;
 
